@@ -16,7 +16,7 @@ import tiktoken
 from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 
-
+openAiKey = "************"
 # Load document
 def load_document(file):
     from langchain.document_loaders import PyPDFLoader
@@ -40,14 +40,14 @@ def calc_embeddings_cost(texts):
 
 
 def create_embeddings_with_chroma(chunks):
-    embeddings = OpenAIEmbeddings(openai_api_key='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')
+    embeddings = OpenAIEmbeddings(openai_api_key=openAiKey)
     vector_store = Chroma.from_documents(chunks, embeddings)
     return vector_store
 
 
 def doc_query_tool(vector_store, q, k=3):
     llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=1,
-                     openai_api_key='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')
+                     openai_api_key=openAiKey)
     retriever = vector_store.as_retriever(search_type='similarity', kwargs={'k': k})
     chain = RetrievalQA.from_chain_type(llm=llm, chain_type='stuff', retriever=retriever)
     answer = chain.run(q)
@@ -58,7 +58,7 @@ def doc_query_tool_with_memory(vector_store, q, chat_history=[]):
     from langchain.chains import ConversationalRetrievalChain
     from langchain.chat_models import ChatOpenAI
     llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=1,
-                     openai_api_key='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')
+                     openai_api_key=openAiKey)
     retriever = vector_store.as_retriever(search_type='similarity', kwargs={'k': 3})
     crc = ConversationalRetrievalChain.from_llm(llm, retriever)
     result = crc({'question': q, 'chat_history': chat_history})
